@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContentFlow — Loading…</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #080808;
+    color: #F0EEE9;
+    font-family: 'Instrument Serif', serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .logo { font-size: 1.75rem; }
+  .logo em { color: #FF4D00; font-style: italic; }
+  p { font-family: Inter, sans-serif; font-size: 0.85rem; color: #A0A0A0; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .dot { display: inline-block; animation: pulse 1.2s infinite; color: #FF4D00; }
+</style>
+</head>
+<body>
+<div class="logo">Content<em>Flow</em></div>
+<p>Signing you in<span class="dot">...</span></p>
+
+<script>
+const SUPABASE_URL = 'https://urzbdammrtjymnzhsveg.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_kaKGdS7fRQgoSmsoEIvgbg_A8kYlDnl'
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+
+;(async () => {
+  // Wait for session from magic link
+  const { data: { session }, error } = await sb.auth.getSession()
+
+  if (error || !session) {
+    // Try to get session from URL hash
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    const { data: { session: session2 } } = await sb.auth.getSession()
+
+    if (!session2) {
+      location.href = 'login.html'
+      return
+    }
+  }
+
+  const currentSession = session || (await sb.auth.getSession()).data.session
+
+  if (!currentSession) {
+    location.href = 'login.html'
+    return
+  }
+
+  // Get user plan
+  const { data: profile } = await sb.from('profiles')
+    .select('plan')
+    .eq('id', currentSession.user.id)
+    .single()
+
+  if (!profile?.plan) {
+    // No plan found - redirect to login with message
+    location.href = 'login.html'
+    return
+  }
+
+  // Redirect to correct platform
+  location.href = `platform-${profile.plan}.html`
+})()
+</script>
+</body>
+</html>
