@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContentFlow — Content Creation Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --accent: #FF4D00;
+    --accent-hover: #e04300;
+    --black: #080808;
+    --dark: #A0A0A0;
+    --light: #161616;
+    --border: #232323;
+    --white: #F0EEE9;
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--white);
+    background: var(--black);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAVBAR ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--black);
+    border-bottom: 1px solid var(--border);
+    height: 58px;
+    display: flex;
+    align-items: center;
+    padding: 0 6vw;
+  }
+
+  .nav-inner {
+    width: 100%;
+    max-width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    color: var(--white);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    flex-shrink: 0;
+  }
+  .nav-logo em { font-style: italic; color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--dark);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--white); text-decoration: underline; }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+  .nav-actions a.ghost {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--dark);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-actions a.ghost:hover { color: var(--white); text-decoration: underline; }
+
+  .btn {
+    display: inline-block;
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .btn-filled {
+    background: var(--accent);
+    color: var(--white);
+    border: 1px solid var(--accent);
+    padding: 0.45rem 1.1rem;
+  }
+  .btn-filled:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    border: 1px solid var(--border);
+    padding: 0.45rem 1.1rem;
+  }
+  .btn-outline:hover { background: var(--white); color: var(--black); border-color: var(--white); }
+  .btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 0.95rem;
+  }
+
+  /* ── LAYOUT ── */
+  main { padding-top: 58px; }
+
+  section {
+    padding: 7rem 6vw;
+    max-width: 1140px;
+    margin: 0 auto;
+  }
+  section.full-width {
+    max-width: 100%;
+    padding-left: 6vw;
+    padding-right: 6vw;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.75rem;
+  }
+
+  h2.serif {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 3.5vw, 2.75rem);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 3rem;
+  }
+  h2.serif em { font-style: italic; color: var(--accent); }
+
+  /* ── HERO ── */
+  #hero {
+    padding-top: 9rem;
+    padding-bottom: 8rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.6rem, 6vw, 4.25rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--white);
+    margin-bottom: 1.5rem;
+    max-width: 720px;
+  }
+  #hero h1 em { font-style: italic; color: var(--accent); }
+
+  #hero .subtext {
+    font-size: 1.05rem;
+    color: var(--dark);
+    max-width: 520px;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-ctas {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .trust-line {
+    font-size: 0.8rem;
+    color: #999;
+    letter-spacing: 0.03em;
+  }
+  .trust-line span {
+    display: inline-block;
+    margin: 0 0.5rem;
+    color: var(--border);
+  }
+
+  /* ── PROBLEM ── */
+  #problem { border-bottom: 1px solid var(--border); }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4rem;
+    margin-top: 1rem;
+  }
+
+  .problem-item .num {
+    font-family: var(--serif);
+    font-size: 3.5rem;
+    color: #242424;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+  .problem-item h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 0.6rem;
+  }
+  .problem-item p {
+    font-size: 0.9rem;
+    color: var(--dark);
+    line-height: 1.7;
+  }
+
+  /* ── HOW IT WORKS ── */
+  #howitworks { border-bottom: 1px solid var(--border); }
+
+  .steps-list {
+    margin-top: 0.5rem;
+    counter-reset: steps;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 2rem;
+    padding: 2.25rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: var(--serif);
+    font-size: 2.5rem;
+    color: #282828;
+    line-height: 1;
+    padding-top: 0.1rem;
+  }
+
+  .step-content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 0.4rem;
+  }
+  .step-content p {
+    font-size: 0.9rem;
+    color: var(--dark);
+  }
+
+  /* ── FEATURES ── */
+  #features { border-bottom: 1px solid var(--border); }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 6rem;
+    align-items: start;
+  }
+
+  .features-intro {
+    font-size: 0.95rem;
+    color: var(--dark);
+    line-height: 1.8;
+  }
+
+  .features-list {
+    margin-top: -0.25rem;
+  }
+
+  .feature-row {
+    padding: 1.4rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .feature-row:first-child { border-top: 1px solid var(--border); }
+
+  .feature-row h4 {
+    font-size: 0.925rem;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 0.3rem;
+  }
+  .feature-row p {
+    font-size: 0.875rem;
+    color: var(--dark);
+  }
+
+  /* ── PRICING ── */
+  #pricing { border-bottom: 1px solid var(--border); }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .pricing-card {
+    border: 1px solid var(--border);
+    background: var(--light);
+    padding: 2.25rem;
+    border-radius: 6px;
+    position: relative;
+  }
+  .pricing-card.featured { border-color: var(--accent); }
+
+  .popular-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    margin-bottom: 1.25rem;
+  }
+
+  .pricing-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .pricing-card .price {
+    font-family: var(--serif);
+    font-size: 2.5rem;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .pricing-card .price-period {
+    font-size: 0.8rem;
+    color: #555;
+    margin-bottom: 1.75rem;
+  }
+
+  .pricing-features {
+    list-style: none;
+    margin-bottom: 2rem;
+  }
+  .pricing-features li {
+    font-size: 0.875rem;
+    color: var(--dark);
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .pricing-features li:last-child { border-bottom: none; }
+  .pricing-features li::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .pricing-cta { width: 100%; text-align: center; padding: 0.65rem; }
+
+  .payg-note {
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+    padding-top: 0.5rem;
+  }
+
+  /* ── TESTIMONIALS ── */
+  #testimonials { border-bottom: 1px solid var(--border); }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .testimonial {
+    padding: 0 3rem 0 0;
+    border-right: 1px solid var(--border);
+  }
+  .testimonial:last-child {
+    padding: 0 0 0 3rem;
+    border-right: none;
+  }
+  .testimonial:nth-child(2) {
+    padding: 0 3rem 0 3rem;
+  }
+
+  .testimonial blockquote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--white);
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+
+  .testimonial cite {
+    font-size: 0.8rem;
+    font-style: normal;
+    color: #555;
+    font-weight: 500;
+  }
+
+  /* ── FINAL CTA ── */
+  #cta {
+    text-align: center;
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+    border-bottom: 1px solid var(--border);
+    max-width: 100%;
+  }
+  #cta h2 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--white);
+    margin-bottom: 1.25rem;
+  }
+  #cta h2 em { font-style: italic; color: var(--accent); }
+  #cta .sub {
+    font-size: 1rem;
+    color: var(--dark);
+    margin-bottom: 2.5rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.75rem 6vw;
+    background: var(--black);
+  }
+  .footer-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  .footer-logo {
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .footer-logo em { font-style: italic; color: var(--accent); }
+
+  .footer-links {
+    display: flex;
+    gap: 1.75rem;
+    list-style: none;
+  }
+  .footer-links a {
+    font-size: 0.8rem;
+    color: #555;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer-links a:hover { color: var(--white); text-decoration: underline; }
+
+  .footer-copy {
+    font-size: 0.8rem;
+    color: #444;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    section { padding: 5rem 5vw; }
+    nav { padding: 0 5vw; }
+
+    .nav-links { display: none; }
+
+    #hero h1 { font-size: 2.6rem; }
+    #hero { padding-top: 7rem; padding-bottom: 6rem; }
+
+    .problem-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .features-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+
+    .testimonial,
+    .testimonial:nth-child(2),
+    .testimonial:last-child {
+      padding: 0 0 2.5rem 0;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .testimonial:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .step { grid-template-columns: 56px 1fr; gap: 1.25rem; }
+
+    .footer-inner { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .footer-links { flex-wrap: wrap; gap: 1rem; }
+
+    .hero-ctas { flex-direction: column; align-items: flex-start; }
+
+    h2.serif { font-size: 2rem; }
+  }
+</style>
+
+<script>(function (w, d, s, p, t) { w.gr = w.gr || function () { w.gr.ce = 60; w.gr.q = w.gr.q || []; w.gr.q.push(arguments); }; p = d.getElementsByTagName(s)[0]; t = d.createElement(s); t.async = true; t.src = "https://script.getreditus.com/v2.js"; p.parentNode.insertBefore(t, p); })(window, document, "script"); gr("initCustomer", "00b5a11f-3da4-4a33-b732-905fee427cbe"); gr("track", "pageview");</script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Content<em>Flow</em></a>
+    <ul class="nav-links">
+      <li><a href="#howitworks">How it works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="affiliate.html">Affiliates</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="ghost">Sign in</a>
+      <a href="platform-starter.html" class="btn btn-filled">Start free →</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="section-label">— THE CONTENT TEAM YOU NEVER HAD TO HIRE</div>
+    <h1>Your brand.<br><em>Everywhere.</em> Every week.</h1>
+    <p class="subtext">Stop posting randomly. Start growing intentionally — without the agency bill.</p>
+    <div class="hero-ctas">
+      <a href="platform-starter.html" class="btn btn-filled btn-lg">Start growing free →</a>
+      <a href="#howitworks" class="btn btn-outline btn-lg">See how it works</a>
+    </div>
+    <p class="trust-line">1,200+ brands<span>·</span>40+ niches<span>·</span>6 languages supported</p>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="section-label">— WHY BRANDS DISAPPEAR</div>
+    <div class="problem-grid">
+      <div class="problem-item">
+        <div class="num">01</div>
+        <h3>The agency bill never stops</h3>
+        <p>Retainers hit $3,000/month before you see a single result. Most brands bleed budget just trying to stay visible.</p>
+      </div>
+      <div class="problem-item">
+        <div class="num">02</div>
+        <h3>Generic AI sounds like no one</h3>
+        <p>Off-the-shelf tools produce content that could belong to any brand — or none. Your audience notices, and scrolls.</p>
+      </div>
+      <div class="problem-item">
+        <div class="num">03</div>
+        <h3>Random posting kills momentum</h3>
+        <p>Algorithms reward brands that show up consistently. Go quiet for a week and you're back to zero.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="howitworks">
+    <div class="section-label">— HOW IT WORKS</div>
+    <h2 class="serif">Built for brands that refuse to <em>disappear</em></h2>
+    <div class="steps-list">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h3>Define your brand profile</h3>
+          <p>Tell us your voice, audience, and ambition — ContentFlow builds a content engine that sounds like you, not a template.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h3>Pick your platforms</h3>
+          <p>Instagram, LinkedIn, TikTok, email, blog — each channel gets content built for its format, not copy-pasted across all of them.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h3>Receive your full content system</h3>
+          <p>Captions, scripts, carousels, calendars — ready every week. No briefs. No back-and-forth. No waiting.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h3>Show up. Every single week.</h3>
+          <p>Copy, schedule, post. ContentFlow keeps your brand in front of the right people — consistently, intentionally, without the overhead.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="section-label">— WHAT YOU GET</div>
+    <h2 class="serif">The content team you never <em>had to hire</em></h2>
+    <div class="features-grid">
+      <div class="features-intro">
+        <p>ContentFlow isn't a prompt box. It's a full content operation built around your brand — combining voice strategy, platform intelligence, and multilingual output into one system that actually runs itself.</p>
+      </div>
+      <div class="features-list">
+        <div class="feature-row">
+          <h4>Brand Voice Definition</h4>
+          <p>Your tone, vocabulary, and edge — locked in once, consistent forever. No more sounding like everyone else.</p>
+        </div>
+        <div class="feature-row">
+          <h4>Platform-Specific Optimization</h4>
+          <p>Every channel gets content engineered for its algorithm and audience — not the same post reformatted five times.</p>
+        </div>
+        <div class="feature-row">
+          <h4>Multilingual Copywriting</h4>
+          <p>Reach audiences in up to 6 languages with native-quality copy. Not translations. Actual writing.</p>
+        </div>
+        <div class="feature-row">
+          <h4>Audience Psychology</h4>
+          <p>Content built around how your specific buyers think, hesitate, and decide — not generic best practices.</p>
+        </div>
+        <div class="feature-row">
+          <h4>Weekly Content Calendars</h4>
+          <p>Topics, formats, timing — mapped out every week so you never start from a blank page again.</p>
+        </div>
+        <div class="feature-row">
+          <h4>Reel &amp; Video Scripts</h4>
+          <p>Short-form scripts with sharp hooks, clear structure, and CTAs built to stop the scroll and keep it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="section-label">— PRICING</div>
+    <h2 class="serif">Show up consistently. Without the <em>agency bill.</em></h2>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Starter</h3>
+        <div class="price">$29</div>
+        <div class="price-period">per month</div>
+        <ul class="pricing-features">
+          <li>1 brand profile</li>
+          <li>2 platforms</li>
+          <li>20 content pieces/month</li>
+          <li>3 video scripts/month</li>
+          <li>English only</li>
+        </ul>
+        <div id="paypal-button-starter" class="pricing-cta"></div>
+      </div>
+      <div class="pricing-card featured">
+        <div class="popular-tag">Most Popular</div>
+        <h3>Growth</h3>
+        <div class="price">$79</div>
+        <div class="price-period">per month</div>
+        <ul class="pricing-features">
+          <li>3 brand profiles</li>
+          <li>4 platforms</li>
+          <li>60 content pieces/month</li>
+          <li>15 video scripts/month</li>
+          <li>2 languages</li>
+        </ul>
+        <div id="paypal-button-growth" class="pricing-cta"></div>
+      </div>
+      <div class="pricing-card">
+        <h3>Pro</h3>
+        <div class="price">$149</div>
+        <div class="price-period">per month</div>
+        <ul class="pricing-features">
+          <li>10 brand profiles</li>
+          <li>All platforms</li>
+          <li>Unlimited content</li>
+          <li>5 languages</li>
+          <li>White-label delivery</li>
+        </ul>
+        <div id="paypal-button-pro" class="pricing-cta"></div>
+      </div>
+    </div>
+    <p class="payg-note">Not ready to commit? Pay-as-you-go at $0.99 per piece.</p>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <div class="section-label">— BRANDS THAT REFUSED TO DISAPPEAR</div>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <blockquote>"We went from posting twice a month to five times a week. Engagement tripled in 90 days — no agency, no new hire."</blockquote>
+        <cite>— Priya M., Founder at Verdant Studio</cite>
+      </div>
+      <div class="testimonial">
+        <blockquote>"It sounds like our team wrote it. We run three brands on ContentFlow now. The consistency alone is worth every cent."</blockquote>
+        <cite>— James K., Head of Marketing at Loopback</cite>
+      </div>
+      <div class="testimonial">
+        <blockquote>"12 client accounts. Half the production time. Better output. I genuinely don't know how we managed before this."</blockquote>
+        <cite>— Sofia R., Director at Northlight Agency</cite>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="cta" class="full-width">
+    <div class="section-label" style="justify-content:center;">— GET STARTED</div>
+    <h2>Stop posting randomly.<br>Start growing <em>intentionally.</em></h2>
+    <p class="sub">No agency. No overhead. No blank pages. Just your brand — everywhere, every week.</p>
+    <a href="platform-starter.html" class="btn btn-filled btn-lg">Start free today →</a>
+    <a href="affiliate.html" class="btn btn-outline btn-lg" style="margin-top:1rem;">Earn 30% as an affiliate →</a>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a href="#" class="footer-logo">Content<em>Flow</em></a>
+    <ul class="footer-links">
+      <li><a href="#howitworks">How it works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="affiliate.html">Affiliates</a></li>
+      <li><a href="#">Privacy</a></li>
+      <li><a href="#">Terms</a></li>
+    </ul>
+    <span class="footer-copy">© 2025 ContentFlow. All rights reserved.</span>
+  </div>
+</footer>
+
+<script>
+  // Smooth scroll for all anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if (id === '#') return;
+      const target = document.querySelector(id);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+<!-- PayPal SDK (Sandbox client-id — swap for the live client-id when you go live) -->
+<script src="https://www.paypal.com/sdk/js?client-id=AdRaXQ-9OIBFdDN3HguO2-WqPjVPWPqIR5I9uILXQ-ImuRb86clX5ake-ECwSI5tQC_BH0efEda9Ig0V&vault=true&intent=subscription"></script>
+<script>
+  // ── PayPal Plan IDs (created in PayPal Subscriptions dashboard) ──
+  const PAYPAL_PLANS = {
+    starter: 'P-32484147CY125784NNIZTEVY',
+    growth:  'P-26U33612V8821674LNIZTFRI',
+    pro:     'P-8G296104GE6856534NIZTGJA'
+  };
+
+  function renderPayPalButton(planKey, containerId) {
+    paypal.Buttons({
+      style: { layout: 'vertical', color: 'black', shape: 'rect', label: 'subscribe' },
+      createSubscription: function (data, actions) {
+        return actions.subscription.create({
+          plan_id: PAYPAL_PLANS[planKey]
+        });
+      },
+      onApprove: function (data) {
+        document.getElementById(containerId).innerHTML =
+          '<p style="color:#4ade80;font-size:0.85rem;text-align:center;">✓ Subscribed! Check your email for your login link.</p>';
+      },
+      onError: function (err) {
+        console.error('PayPal error:', err);
+        alert('Something went wrong with your subscription. Please try again.');
+      }
+    }).render(`#${containerId}`);
+  }
+
+  renderPayPalButton('starter', 'paypal-button-starter');
+  renderPayPalButton('growth', 'paypal-button-growth');
+  renderPayPalButton('pro', 'paypal-button-pro');
+</script>
+</body>
+</html>
