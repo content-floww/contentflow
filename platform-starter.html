@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContentFlow — Starter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --accent: #FF4D00;
+    --accent-hover: #e04300;
+    --black: #080808;
+    --surface: #0f0f0f;
+    --card: #161616;
+    --border: #232323;
+    --border-light: #2a2a2a;
+    --white: #F0EEE9;
+    --muted: #A0A0A0;
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--white);
+    background: var(--black);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    background: var(--black);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-left { display: flex; align-items: center; gap: 1rem; }
+
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo em { font-style: italic; color: var(--accent); }
+
+  .nav-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(255,77,0,0.3);
+    padding: 0.2rem 0.55rem;
+    border-radius: 2px;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse-green 2s infinite;
+  }
+  @keyframes pulse-green {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .status-text {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── LAYOUT ── */
+  .app {
+    display: flex;
+    height: calc(100vh - 52px);
+    margin-top: 52px;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .sidebar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .sidebar-section {
+    padding: 1.25rem 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.25rem;
+  }
+
+  .sidebar-section:last-child { border-bottom: none; }
+
+  .section-title {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.9rem;
+  }
+
+  /* ── FORM INPUTS ── */
+  .form-group { margin-bottom: 0.75rem; }
+  .form-group:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 0.35rem;
+    letter-spacing: 0.02em;
+  }
+
+  input[type="text"],
+  select,
+  textarea {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--white);
+    font-family: var(--sans);
+    font-size: 0.825rem;
+    padding: 0.5rem 0.65rem;
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+
+  input[type="text"]:focus,
+  select:focus,
+  textarea:focus {
+    border-color: rgba(255,77,0,0.5);
+  }
+
+  input[type="text"]::placeholder,
+  textarea::placeholder { color: #444; }
+
+  select option { background: #1a1a1a; }
+
+  .tone-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+  }
+
+  .tone-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .tone-btn:hover { border-color: var(--border-light); color: var(--white); }
+  .tone-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(255,77,0,0.06); }
+
+  .platform-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .platform-tag {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.3rem 0.55rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .platform-tag:hover { border-color: var(--border-light); color: var(--white); }
+  .platform-tag.active { border-color: var(--accent); color: var(--accent); background: rgba(255,77,0,0.06); }
+
+  /* ── SKILL GRID ── */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+  }
+
+  .skill-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.65rem 0.7rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .skill-card:hover {
+    border-color: var(--border-light);
+    background: #1a1a1a;
+  }
+
+  .skill-card.active {
+    border-color: var(--accent);
+    background: rgba(255,77,0,0.05);
+  }
+
+  .skill-card.active::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px; height: 100%;
+    background: var(--accent);
+    border-radius: 4px 0 0 4px;
+  }
+
+  .skill-icon {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    display: block;
+  }
+
+  .skill-name {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.2;
+    display: block;
+  }
+
+  .skill-card.active .skill-name { color: var(--accent); }
+
+  /* ── MAIN AREA ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── OUTPUT ── */
+  .output-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem 2.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .output-empty {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 1rem;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .output-empty-icon {
+    font-family: var(--serif);
+    font-size: 3rem;
+    font-style: italic;
+    color: var(--accent);
+    opacity: 0.5;
+  }
+
+  .output-empty h3 {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--white);
+  }
+
+  .output-empty p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 320px;
+    line-height: 1.7;
+  }
+
+  /* ── RESULT BLOCK ── */
+  .result-block {
+    max-width: 780px;
+  }
+
+  .result-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-skill-tag {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(255,77,0,0.3);
+    padding: 0.2rem 0.55rem;
+    border-radius: 2px;
+  }
+
+  .result-brand {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .result-body {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #d4d0c8;
+  }
+
+  /* Markdown rendering */
+  .result-body h1 {
+    font-family: var(--serif);
+    font-size: 1.75rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin: 1.75rem 0 0.75rem;
+    line-height: 1.2;
+  }
+
+  .result-body h1 em { color: var(--accent); }
+
+  .result-body h2 {
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: var(--white);
+    margin: 1.5rem 0 0.6rem;
+    line-height: 1.3;
+  }
+
+  .result-body h3 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: 0.01em;
+    margin: 1.25rem 0 0.5rem;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
+
+  .result-body p {
+    margin-bottom: 0.9rem;
+  }
+
+  .result-body ul, .result-body ol {
+    padding-left: 1.25rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .result-body li {
+    margin-bottom: 0.35rem;
+    color: #c8c4bb;
+  }
+
+  .result-body li::marker { color: var(--accent); }
+
+  .result-body strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .result-body em { font-style: italic; }
+
+  .result-body hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+
+  .result-body code {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.8rem;
+    padding: 0.15rem 0.4rem;
+    color: #e0a875;
+  }
+
+  .result-body pre {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+
+  .result-body pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.8rem;
+    color: #c4bfb6;
+  }
+
+  .result-body blockquote {
+    border-left: 2px solid var(--accent);
+    padding-left: 1rem;
+    color: var(--muted);
+    font-style: italic;
+    margin: 1rem 0;
+  }
+
+  /* Table styling */
+  .result-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    font-size: 0.825rem;
+  }
+
+  .result-body th {
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .result-body td {
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem 0.75rem;
+    color: #c8c4bb;
+  }
+
+  .result-body tr:last-child td { border-bottom: none; }
+
+  /* ── CURSOR ── */
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: var(--accent);
+    margin-left: 1px;
+    vertical-align: text-bottom;
+    animation: blink 0.9s infinite;
+  }
+
+  @keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  /* ── INPUT BAR ── */
+  .input-bar {
+    border-top: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .skill-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .skill-indicator-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .skill-indicator-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .skill-indicator-name.empty { color: #444; }
+
+  .input-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+  }
+
+  .input-row textarea {
+    flex: 1;
+    resize: none;
+    min-height: 52px;
+    max-height: 120px;
+    border-radius: 6px;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    overflow-y: auto;
+  }
+
+  .send-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    color: var(--white);
+    font-family: var(--sans);
+    font-size: 0.825rem;
+    font-weight: 500;
+    padding: 0.65rem 1.25rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    height: 52px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .send-btn:hover { background: var(--accent-hover); }
+  .send-btn:disabled { background: #3a2010; color: #7a4020; cursor: not-allowed; }
+
+  .send-btn svg { width: 14px; height: 14px; }
+
+  .input-hint {
+    font-size: 0.7rem;
+    color: #3a3a3a;
+    text-align: center;
+  }
+
+  /* ── ERROR ── */
+  .error-block {
+    background: rgba(255, 77, 0, 0.06);
+    border: 1px solid rgba(255, 77, 0, 0.25);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    color: #ff8a6a;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    max-width: 780px;
+  }
+
+  /* ── HISTORY NAV ── */
+  .history-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1.5rem;
+    height: 38px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .history-bar::-webkit-scrollbar { display: none; }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 3px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .history-item:hover { border-color: var(--border-light); color: var(--white); }
+  .history-item.active { border-color: rgba(255,77,0,0.4); color: var(--accent); }
+
+  .history-dot {
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    opacity: 0.6;
+  }
+
+  .new-session-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 3px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .new-session-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── COPY BTN ── */
+  .result-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .copy-btn, .clear-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { border-color: var(--white); color: var(--white); }
+  .clear-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a href="contentflow.html" class="nav-logo">Content<em>Flow</em></a>
+    <span class="nav-badge" style="color:#f59e0b;border-color:rgba(245,158,11,0.3)">Starter</span>
+  </div>
+  <div class="nav-right">
+    <div class="status-dot"></div>
+    <span class="status-text">Starter Plan</span>
+  </div>
+</nav>
+
+<!-- APP -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-scroll">
+
+      <!-- Brand Profile -->
+      <div class="sidebar-section">
+        <div class="section-title">Brand Profile</div>
+
+        <div class="form-group">
+          <label>Business Name</label>
+          <input type="text" id="brandName" placeholder="e.g. Verdant Studio" />
+        </div>
+
+        <div class="form-group">
+          <label>Industry / Niche</label>
+          <input type="text" id="industry" placeholder="e.g. Sustainable fashion" />
+        </div>
+
+        <div class="form-group">
+          <label>Target Audience</label>
+          <input type="text" id="audience" placeholder="e.g. Women 25–40, eco-conscious" />
+        </div>
+
+        <div class="form-group">
+          <label>Language</label>
+          <select id="language">
+            <option value="English">English</option>
+            <option value="French">French</option>
+            <option value="Spanish">Spanish</option>
+            <option value="Arabic">Arabic</option>
+            <option value="Portuguese">Portuguese</option>
+            <option value="German">German</option>
+            <option value="Italian">Italian</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Brand Tone</label>
+          <div class="tone-grid">
+            <button class="tone-btn active" data-tone="Professional">Professional</button>
+            <button class="tone-btn" data-tone="Friendly">Friendly</button>
+            <button class="tone-btn" data-tone="Bold">Bold</button>
+            <button class="tone-btn" data-tone="Minimal">Minimal</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Platforms</label>
+          <div class="platform-grid" id="platformGrid">
+            <span class="platform-tag active" data-platform="Instagram">Instagram</span>
+            <span class="platform-tag" data-platform="LinkedIn">LinkedIn</span>
+            <span class="platform-tag" data-platform="TikTok">TikTok</span>
+            <span class="platform-tag" data-platform="Facebook">Facebook</span>
+            <span class="platform-tag" data-platform="Twitter/X">Twitter/X</span>
+            <span class="platform-tag" data-platform="Email">Email</span>
+            <span class="platform-tag" data-platform="Blog">Blog</span>
+            <span class="platform-tag" data-platform="YouTube">YouTube</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill Select -->
+      <div class="sidebar-section">
+        <div class="section-title">Select Skill</div>
+        <div class="skill-grid" id="skillGrid">
+          <div class="skill-card" data-skill="content-strategy">
+            <span class="skill-icon">✦</span>
+            <span class="skill-name">Content Strategy</span>
+          </div>
+          <div class="skill-card" data-skill="ad-creative">
+            <span class="skill-icon">◈</span>
+            <span class="skill-name">Ad Creative</span>
+          </div>
+          <div class="skill-card" data-skill="marketing-ideas">
+            <span class="skill-icon">◇</span>
+            <span class="skill-name">Marketing Ideas</span>
+          </div>
+        </div>
+        <p style="font-size:0.7rem;color:#444;margin-top:0.75rem;line-height:1.5;">Upgrade to Growth or Pro to unlock more skills.</p>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- HISTORY BAR -->
+    <div class="history-bar" id="historyBar">
+      <button class="new-session-btn" id="newSessionBtn">+ New</button>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="output-area" id="outputArea">
+      <div class="output-empty" id="emptyState">
+        <div class="output-empty-icon">CF</div>
+        <h3>Your content engine is ready.</h3>
+        <p>Select a skill on the left, fill in your brand profile, then describe what you need below.</p>
+      </div>
+    </div>
+
+    <!-- INPUT BAR -->
+    <div class="input-bar">
+      <div class="skill-indicator">
+        <span class="skill-indicator-label">Skill:</span>
+        <span class="skill-indicator-name empty" id="selectedSkillLabel">None selected</span>
+      </div>
+      <div class="input-row">
+        <textarea
+          id="requestInput"
+          placeholder="Describe what you need — be specific about your goal, platform, format, or any constraints…"
+          rows="2"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+          Generate
+        </button>
+      </div>
+      <div class="input-hint">Cmd + Enter to generate</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://jwmcwqnozstfmysshpbo.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3bWN3cW5venN0Zm15c3NocGJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MzEyODUsImV4cCI6MjA5NzMwNzI4NX0.i4qDussQC1isoj_0ZkxsxMtDM03AU97iOEfowaGK54s";
+const GENERATE_FN = SUPABASE_URL + "/functions/v1/generate-content";
+
+// ── AUTH GATE ──
+(function() {
+  const s = JSON.parse(localStorage.getItem("cf_session") || "null");
+  if (!s || !s.access_token) { window.location.href = "/contentflow/index.html"; }
+  window.USER_TOKEN = s.access_token;
+})();
+
+// ── STATE ──
+let selectedSkill = null;
+let selectedTone = 'Professional';
+let selectedPlatforms = new Set(['Instagram']);
+let isGenerating = false;
+let sessions = [];
+let currentSessionId = null;
+
+// ── SKILL SYSTEM PROMPTS ──
+const SKILL_PROMPTS = {
+  'content-strategy': {
+    name: 'Content Strategy',
+    system: `You are an expert content strategist. Help plan content that drives traffic, builds authority, and generates leads.
+
+Your outputs must be either searchable (captures existing demand — optimized for people actively searching) or shareable (creates demand — spreads ideas) or both. Always prioritize searchable content as the foundation.
+
+When planning content:
+- Identify 3–5 content pillars aligned to the brand's product and audience
+- Map topics to buyer stages: Awareness (what is, how to), Consideration (best, vs, alternatives), Decision (pricing, reviews, demo), Implementation (templates, tutorials)
+- Provide specific titles, not just topics
+- Include the content type: use-case, hub/spoke, thought leadership, data-driven, case study
+- Score each idea by: Customer Impact (40%), Content-Market Fit (30%), Search Potential (20%), Resources (10%)
+
+Output in clear sections: Pillars, Priority Topics (as a table), Cluster Map, First 3 pieces to create. Be specific and actionable — no generic advice.`
+  },
+  'ad-creative': {
+    name: 'Ad Creative',
+    system: `You are an expert performance creative strategist. Generate high-performing ad copy — headlines, descriptions, and primary text — that drive clicks and conversions.
+
+Always work with distinct ANGLES before writing variations. Angles include: Pain Point, Outcome, Social Proof, Curiosity, Comparison, Urgency, Identity, Contrarian.
+
+Platform character limits to always respect:
+- Google RSA Headlines: 30 chars max, up to 15
+- Google Descriptions: 90 chars max, up to 4
+- Meta Primary Text: 125 chars visible
+- Meta Headline: 40 chars recommended
+- LinkedIn Intro: 150 chars recommended
+- TikTok Ad Text: 80 chars recommended
+
+Rules:
+- Include character count after every piece of copy
+- Flag anything over limit with a trimmed alternative
+- Headlines must work independently (RSA)
+- Include at least 2–3 CTA headlines
+- Descriptions should complement, not repeat, headlines
+- Vary structure: questions, statements, commands, numbers
+
+Output organized by angle, then by format. Offer CSV format for bulk uploads when generating 10+ variations.`
+  },
+  'analytics': {
+    name: 'Analytics Tracking',
+    system: `You are an expert in analytics implementation and measurement. Help set up tracking that provides actionable insights.
+
+Guiding principles:
+- Track for decisions, not data — every event must inform an action
+- Start with questions, work backwards to what to track
+- Naming convention: Object-Action format (signup_completed, button_clicked, form_submitted)
+- Quality > quantity
+
+Essential events to always cover:
+- Marketing Site: cta_clicked (button_text, location), form_submitted (form_type), signup_completed (method, source), demo_requested
+- Product/App: onboarding_step_completed, feature_used, purchase_completed, subscription_cancelled
+
+For GTM: explain container structure (Tags/Triggers/Variables) and data layer patterns
+For GA4: custom event code examples, conversion setup
+For UTMs: naming conventions (lowercase, underscores), tracking spreadsheet structure
+
+Always output:
+1. Tracking Plan (table: Event Name | Properties | Trigger | Notes)
+2. Implementation code examples
+3. Validation checklist
+4. Privacy/compliance considerations
+
+Be specific about what to track and exactly how to implement it.`
+  },
+  'community': {
+    name: 'Community Marketing',
+    system: `You are an expert community builder and community-led growth strategist. Help design, launch, and grow communities that create genuine value while driving business outcomes.
+
+Core principle: Build around shared IDENTITY, not just the product. Members join for the product, stay for the people and identity.
+
+The Community Flywheel: Members join → get value → engage → create content/help others → new members discover the community
+
+Playbooks by stage:
+- Launch (0 members): recruit 20–50 founding members manually, seed conversations, do things that don't scale
+- Growing (100–1k): audit drop-off points, create new member journey, recurring rituals, identify power users
+- Ambassador: find people who recommend unprompted, personal outreach, meaningful benefits, give them tools
+
+Platform selection: Discord (developer/creator), Slack (B2B), Circle (creator/course), Reddit (public/SEO), Discourse (technical/SEO)
+
+Health metrics to always include:
+- DAU/MAU ratio (>20% = healthy)
+- New member post rate (% posting within 7 days)
+- Thread reply rate
+- Content from non-staff (%)
+
+Output as: Community Strategy Doc, Channel Architecture, New Member Journey, Ritual Calendar, or Ambassador Program Brief. Always be specific — give actionable steps, not generic advice.`
+  },
+  'customer-research': {
+    name: 'Customer Research',
+    system: `You are an expert customer researcher. Uncover what customers actually think, feel, say, and struggle with — so positioning, product, and copy are grounded in reality.
+
+Two modes:
+1. ANALYZE existing assets (transcripts, surveys, reviews, support tickets, NPS)
+2. FIND research from digital sources (Reddit, G2, Capterra, YouTube comments, forums)
+
+For analyzing assets, extract:
+- Jobs to Be Done: Functional job (the task), Emotional job (how they want to feel), Social job (how they want to be perceived)
+- Pain Points: prioritize those mentioned unprompted with emotional language
+- Trigger Events: what changed that made them seek a solution
+- Desired Outcomes: what success looks like in their words
+- Language/Vocabulary: exact phrases customers use (gold for copy)
+- Alternatives Considered: competitors, DIY, do nothing
+
+Confidence labeling: High (3+ independent sources, mentioned unprompted), Medium (2 sources or prompted), Low (single source)
+
+For digital watering holes by ICP:
+- B2B SaaS: Reddit (role-specific), G2/Capterra, Hacker News, LinkedIn
+- SMB/founders: r/entrepreneur, Indie Hackers, Product Hunt
+- Consumer: App store reviews (1-3 stars), Reddit hobby subs, YouTube comments
+
+Output formats: Research synthesis report, VOC quote bank, Persona document, Jobs-to-be-done map, Competitive intelligence summary. Always include verbatim quotes with source attribution.`
+  },
+  'image': {
+    name: 'Image Strategy',
+    system: `You are an expert visual content producer for marketing. Help create and plan marketing images using AI generation, design tools, and optimization best practices.
+
+Tool selection guide:
+- Need text in image → Ideogram (best), Gemini (good), GPT Image (decent)
+- Need photorealism/brand consistency → Flux Pro
+- Need to edit existing → Gemini native editing
+- Need volume at low cost → Flux Klein
+
+AI image prompt formula: Subject + Setting + Style + Lighting + Composition + Technical specs
+
+Platform dimensions (always specify):
+- Twitter/X: 1200x675 (16:9)
+- LinkedIn: 1200x627 (1.91:1)
+- Instagram Feed: 1080x1080 (1:1) or 1080x1350 (4:5)
+- Instagram Stories: 1080x1920 (9:16)
+- Facebook: 1200x630
+- Blog/OG: 1200x630
+- LinkedIn company cover: 1128x191
+
+Critical rules:
+- NEVER use AI for product UI screenshots (models hallucinate interfaces — use real screenshots)
+- Always specify aspect ratio in prompts
+- Use Ideogram for anything with text overlay
+- Compress to WebP, target <200KB for web
+- Add alt text: descriptive, keyword-relevant
+
+OG meta tags: always include og:image, og:image:width, og:image:height, twitter:card, twitter:image
+
+Output: specific prompts for each image type needed, platform specs, optimization checklist, tool recommendation with rationale.`
+  },
+  'lead-magnets': {
+    name: 'Lead Magnets',
+    system: `You are an expert in lead magnet strategy. Plan lead magnets that capture emails, generate qualified leads, and naturally lead to product adoption.
+
+Core principles:
+1. Solve ONE specific problem (not broad topics)
+2. Match buyer stage: Awareness (education), Consideration (comparison/evaluation), Decision (implementation help)
+3. High perceived value, consumable in <30 minutes
+4. Natural path to the product
+
+Lead magnet types by effort:
+- Low: Checklist (1-2hr), Cheat sheet (2-4hr), Template (2-8hr)
+- Medium: Swipe file, Quiz/assessment, Mini-course email (1-2 weeks)
+- High: Ebook/guide, Webinar, Resource library
+
+Gating strategy:
+- Email only = highest conversion (default choice)
+- Each extra field reduces conversion 5-10%
+- Partial gate (preview + full) balances reach and capture
+- Content upgrades convert 2-5x better than generic CTAs
+
+Landing page structure: Headline (clear benefit) → Preview/mockup → What's inside (3-5 bullets) → Social proof → Form (minimal fields) → FAQ
+
+Key metrics: Landing page CVR (20-40% warm, 5-15% cold), Lead-to-customer rate, Email engagement (30-50% open, 2-5% click)
+
+Output: Lead magnet recommendation with rationale, content outline, gating plan, landing page structure, distribution plan (blog CTAs, social, paid), measurement plan with A/B test ideas.`
+  },
+  'marketing-ideas': {
+    name: 'Marketing Ideas',
+    system: `You are a marketing strategist with a library of 139 proven marketing ideas for SaaS and software products.
+
+Ideas by category:
+- Content & SEO: Programmatic SEO, glossary marketing, use-case content, hub/spoke, template libraries, content repurposing
+- Competitor: Comparison pages, alternative pages, marketing jiu-jitsu (target competitor keywords)
+- Free Tools: Calculators, generators, Chrome extensions, graders (engineering as marketing)
+- Paid Ads: LinkedIn, Google, Meta, retargeting, podcast ads, newsletter sponsorships
+- Social & Community: LinkedIn audience building, Reddit marketing, short-form video, comment marketing
+- Email: Founder emails, onboarding sequences, win-back campaigns, newsletter
+- Partnerships: Affiliate programs, integration marketing, newsletter swaps, co-marketing
+- Events: Webinars, conference speaking, virtual summits, workshops
+- PR & Media: Press coverage, journalist relationships, data stories
+- Launches: Product Hunt, lifetime deals, giveaways, AppSumo
+- Product-Led: Viral loops, powered-by marketing, free migrations, in-app upsells
+- Developer: DevRel, certifications, open source, API integrations
+
+When recommending ideas, always tailor to:
+- Stage: Pre-launch / Early / Growth / Scale
+- Budget: Free / Low (<$1k/mo) / Medium / High
+- Timeline: Quick wins (ads, email) vs. Medium (SEO, community) vs. Long-term (brand)
+- Team size and available skills
+
+For each idea provide: Why it fits this specific brand, first 2-3 implementation steps, expected outcome, resources needed, timeline. Give 5 ideas maximum, deeply tailored — not a generic list.`
+  },
+  'sales-enablement': {
+    name: 'Sales Enablement',
+    system: `You are an expert in B2B sales enablement. Create sales collateral that reps actually use — decks, one-pagers, objection docs, demo scripts, and playbooks that help close deals.
+
+Core principle: Sales uses what sales trusts. Involve reps in creation, use their language, not marketing's.
+
+Sales deck framework (10-12 slides):
+1. Current World Problem, 2. Cost of the Problem, 3. The Shift Happening, 4. Your Approach, 5. Product Walkthrough (3-4 key workflows), 6. Proof Points, 7. Case Study, 8. Implementation/Timeline, 9. ROI/Value, 10. Pricing Overview, 11. Next Steps/CTA
+
+Customize by buyer type:
+- Technical buyer: architecture, security, integrations, API
+- Economic buyer: ROI, payback period, total cost, risk
+- Champion: internal selling points, quick wins, peer proof
+
+Objection categories: Price, Timing, Competition, Authority, Status quo, Technical
+For each objection: Objection statement → Why they say it → Response approach → Proof point → Follow-up question
+
+One-pager structure (1 page): Problem statement → Your solution → 3 differentiators → Proof point → CTA with contact
+
+Persona types for buyer cards: Economic buyer (signs check), Technical buyer (evaluates product), End user (daily use), Champion (internal advocate), Blocker (opposes purchase)
+
+Output: Slide-by-slide outline with headlines + speaker notes, OR full one-pager copy, OR objection table, OR demo script with timing. Always tie claims to business outcomes (revenue, efficiency, risk reduction). Replace features with results.`
+  },
+  'video': {
+    name: 'Video Production',
+    system: `You are an expert video producer for marketing. Help create video content using AI generation, AI avatars, and programmatic frameworks.
+
+Production approach selection:
+- Programmatic (Hyperframes/Remotion): templated, data-driven, batch video — product updates, recurring content
+- AI Generation (Veo, Runway, Kling): B-roll, hero visuals, scenes you can't film — NOT for product UI
+- AI Avatars (HeyGen, Synthesia): talking-head without filming — explainers, tutorials, multilingual
+- Editing/Repurposing (Descript, Opus Clip): long-form → short clips
+
+AI avatar recommendation: HeyGen (best lip-sync, 140+ languages, MCP server for agents), Synthesia (corporate/enterprise)
+
+Platform aspect ratios (always specify):
+- TikTok/Reels/Shorts: 9:16 vertical
+- YouTube/website: 16:9 landscape
+- LinkedIn feed: 16:9 or 1:1
+- Instagram feed: 1:1 or 4:5
+
+Video prompt formula: Subject + Action + Camera movement + Style + Lighting + Mood
+
+Script structure: Opening (2min) → Discovery recap (3min) → Solution walkthrough (15-20min) → Interaction points → Close with next steps (5min)
+
+Critical rules:
+- Never use AI generation for product UI (use screen recording)
+- Always add captions (85% of social video watched without sound)
+- AI can't reliably render text — use programmatic overlays
+- Authentic often outperforms polished on TikTok
+
+Output: Production approach recommendation, script outline or full script, tool recommendations with rationale, platform-specific specs, production checklist.`
+  }
+};
+
+// ── DOM ──
+const outputArea = document.getElementById('outputArea');
+const emptyState = document.getElementById('emptyState');
+const requestInput = document.getElementById('requestInput');
+const sendBtn = document.getElementById('sendBtn');
+const selectedSkillLabel = document.getElementById('selectedSkillLabel');
+const historyBar = document.getElementById('historyBar');
+const newSessionBtn = document.getElementById('newSessionBtn');
+
+// ── TONE BUTTONS ──
+document.querySelectorAll('.tone-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTone = btn.dataset.tone;
+  });
+});
+
+// ── PLATFORM TAGS — STARTER: max 2 ──
+const MAX_PLATFORMS = 2;
+document.querySelectorAll('.platform-tag').forEach(tag => {
+  tag.addEventListener('click', () => {
+    const p = tag.dataset.platform;
+    if (tag.classList.contains('active')) {
+      tag.classList.remove('active');
+      selectedPlatforms.delete(p);
+    } else {
+      if (selectedPlatforms.size >= MAX_PLATFORMS) {
+        tag.style.borderColor = 'rgba(255,77,0,0.4)';
+        setTimeout(() => tag.style.borderColor = '', 600);
+        return;
+      }
+      tag.classList.add('active');
+      selectedPlatforms.add(p);
+    }
+  });
+});
+
+// ── SKILL CARDS ──
+document.querySelectorAll('.skill-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.skill-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    selectedSkill = card.dataset.skill;
+    const skillData = SKILL_PROMPTS[selectedSkill];
+    selectedSkillLabel.textContent = skillData.name;
+    selectedSkillLabel.classList.remove('empty');
+    updateSendBtn();
+  });
+});
+
+// ── SEND BUTTON STATE ──
+function updateSendBtn() {
+  const hasSkill = !!selectedSkill;
+  const hasRequest = requestInput.value.trim().length > 0;
+  sendBtn.disabled = !(hasSkill && hasRequest) || isGenerating;
+}
+
+requestInput.addEventListener('input', updateSendBtn);
+
+// ── KEYBOARD SHORTCUT ──
+requestInput.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    e.preventDefault();
+    if (!sendBtn.disabled) generate();
+  }
+  // Auto-resize
+  requestInput.style.height = 'auto';
+  requestInput.style.height = Math.min(requestInput.scrollHeight, 120) + 'px';
+});
+
+// ── BUILD BRAND CONTEXT ──
+function getBrandContext() {
+  const name = document.getElementById('brandName').value.trim() || 'the business';
+  const industry = document.getElementById('industry').value.trim() || 'not specified';
+  const audience = document.getElementById('audience').value.trim() || 'not specified';
+  const language = document.getElementById('language').value;
+  const platforms = selectedPlatforms.size > 0 ? [...selectedPlatforms].join(', ') : 'not specified';
+
+  return `Brand Profile:
+- Business Name: ${name}
+- Industry / Niche: ${industry}
+- Target Audience: ${audience}
+- Brand Tone: ${selectedTone}
+- Language: ${language}
+- Active Platforms: ${platforms}`;
+}
+
+// ── MARKDOWN RENDERER ──
+function renderMarkdown(text) {
+  return text
+    // Escape HTML first
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    // Tables (basic)
+    .replace(/^\|(.+)\|$/gm, (match) => {
+      const cells = match.split('|').slice(1, -1).map(c => c.trim());
+      return '<table-row>' + cells.map(c => `<td>${c}</td>`).join('') + '</table-row>';
+    })
+    // Headers
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // Bold + italic combo
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Italic
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // HR
+    .replace(/^---+$/gm, '<hr>')
+    // Blockquote
+    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+    // Unordered lists
+    .replace(/^[•\-\*] (.+)$/gm, '<li>$1</li>')
+    // Ordered lists
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    // Wrap adjacent <li> in <ul>
+    .replace(/(<li>.*<\/li>\n?)+/g, (match) => `<ul>${match}</ul>`)
+    // Line breaks → paragraphs (not inside html tags)
+    .split('\n\n')
+    .map(block => {
+      block = block.trim();
+      if (!block) return '';
+      if (block.startsWith('<h') || block.startsWith('<ul') || block.startsWith('<hr') || block.startsWith('<blockquote') || block.startsWith('<table')) return block;
+      return `<p>${block.replace(/\n/g, '<br>')}</p>`;
+    })
+    .join('\n')
+    // Fix table rows
+    .replace(/<table-row>(.*?)<\/table-row>/g, (match, cells) => {
+      return cells.includes('th>') ? `<tr>${cells}</tr>` : `<tr>${cells.replace(/<td>/g, '<td>').replace(/<\/td>/g, '</td>')}</tr>`;
+    });
+}
+
+// ── SESSIONS ──
+function createSession(skillName, request) {
+  const id = Date.now().toString();
+  const session = {
+    id,
+    skillName,
+    request: request.substring(0, 32) + (request.length > 32 ? '…' : ''),
+    content: ''
+  };
+  sessions.push(session);
+  currentSessionId = id;
+
+  // Add to history bar
+  const item = document.createElement('div');
+  item.className = 'history-item active';
+  item.dataset.sessionId = id;
+  item.innerHTML = `<span class="history-dot"></span>${skillName}: ${session.request}`;
+  item.addEventListener('click', () => switchSession(id));
+
+  // Deactivate others
+  document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
+  historyBar.appendChild(item);
+
+  return session;
+}
+
+function switchSession(id) {
+  const session = sessions.find(s => s.id === id);
+  if (!session) return;
+  currentSessionId = id;
+  document.querySelectorAll('.history-item').forEach(i => {
+    i.classList.toggle('active', i.dataset.sessionId === id);
+  });
+  renderSession(session);
+}
+
+function renderSession(session) {
+  emptyState && (emptyState.style.display = 'none');
+  outputArea.innerHTML = '';
+  if (session.content) {
+    const block = buildResultBlock(session.skillName, session.content, false);
+    outputArea.appendChild(block);
+  }
+}
+
+function buildResultBlock(skillName, htmlContent, streaming) {
+  const block = document.createElement('div');
+  block.className = 'result-block';
+  block.innerHTML = `
+    <div class="result-meta">
+      <span class="result-skill-tag">${skillName}</span>
+      <span class="result-brand">${document.getElementById('brandName').value.trim() || 'Your Brand'}</span>
+    </div>
+    <div class="result-body" id="resultBody">${htmlContent}${streaming ? '<span class="cursor"></span>' : ''}</div>
+    ${!streaming ? `
+    <div class="result-actions">
+      <button class="copy-btn">Copy text</button>
+      <button class="clear-btn">Clear</button>
+    </div>` : ''}
+  `;
+
+  if (!streaming) {
+    block.querySelector('.copy-btn')?.addEventListener('click', () => {
+      const text = block.querySelector('.result-body').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = block.querySelector('.copy-btn');
+        btn.textContent = 'Copied ✓';
+        setTimeout(() => btn.textContent = 'Copy text', 1500);
+      });
+    });
+    block.querySelector('.clear-btn')?.addEventListener('click', () => {
+      outputArea.innerHTML = '';
+      emptyState && (emptyState.style.display = 'flex');
+    });
+  }
+
+  return block;
+}
+
+// ── NEW SESSION ──
+newSessionBtn.addEventListener('click', () => {
+  outputArea.innerHTML = '';
+  if (emptyState) emptyState.style.display = 'flex';
+  requestInput.value = '';
+  updateSendBtn();
+});
+
+// ── GENERATE ──
+async function generate() {
+  if (isGenerating || !selectedSkill) return;
+  const request = requestInput.value.trim();
+  if (!request) return;
+
+  isGenerating = true;
+  sendBtn.disabled = true;
+  sendBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Generating…`;
+
+  const skillData = SKILL_PROMPTS[selectedSkill];
+  const brandContext = getBrandContext();
+  const userMessage = `${brandContext}\n\n---\n\nRequest: ${request}`;
+
+  // Hide empty state
+  if (emptyState) emptyState.style.display = 'none';
+  outputArea.innerHTML = '';
+
+  // Create session
+  const session = createSession(skillData.name, request);
+
+  // Build streaming block
+  const block = buildResultBlock(skillData.name, '', true);
+  outputArea.appendChild(block);
+  const resultBody = block.querySelector('#resultBody');
+
+  let rawText = '';
+
+  try {
+    const response = await fetch(GENERATE_FN, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${window.USER_TOKEN}`
+      },
+      body: JSON.stringify({
+        prompt: userMessage,
+        systemPrompt: skillData.system
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `API error ${response.status}`);
+    }
+
+    const resData = await response.json();
+    rawText = resData.result || resData.error || "No response received.";
+    resultBody.innerHTML = renderMarkdown(rawText) + '<span class="cursor"></span>';
+
+    // Finalize
+    session.content = renderMarkdown(rawText);
+    const finalBlock = buildResultBlock(skillData.name, session.content, false);
+    outputArea.innerHTML = '';
+    outputArea.appendChild(finalBlock);
+    outputArea.scrollTop = 0;
+
+  } catch (err) {
+    outputArea.innerHTML = '';
+    const errBlock = document.createElement('div');
+    errBlock.className = 'error-block';
+    errBlock.innerHTML = `<strong>Error:</strong> ${err.message}. Check your API key or try again.`;
+    outputArea.appendChild(errBlock);
+    if (emptyState) emptyState.style.display = 'none';
+  }
+
+  isGenerating = false;
+  sendBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg> Generate`;
+  updateSendBtn();
+  requestInput.value = '';
+  requestInput.style.height = 'auto';
+}
+
+// ── CSS SPIN ──
+const styleEl = document.createElement('style');
+styleEl.textContent = `@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
+document.head.appendChild(styleEl);
+
+sendBtn.addEventListener('click', generate);
+</script>
+</body>
+</html>
